@@ -193,16 +193,28 @@ public class ArtSketch extends PApplet {
         float blinking, blinkSpeed;
         boolean reverseBlink;
 
+        int shineRadius;
+        float shineSpeed = 0.1f;
+        float shineAmplitude = 5;
+
         Star(int c) {
-            colour = c;
-            // randomise size, initial position and velocity
-            radius = random(1, 3);
+            //colour = c;
+            // randomize size, initial position and velocity
+            radius = random(0.5f, 2);
             p = new PVector(
                     random(border + radius, width - border - radius),
                     random(border + radius, height - border - radius));
             v = new PVector(
                     random(0.2f) * (random(-1, 1) > 0 ? 1 : -1),
                     random(0.2f) * (random(-1, 1) > 0 ? 1 : -1));
+            randomInit();
+        }
+
+        void randomInit() {
+            colour = color(random(210, 255), random(210, 240), random(210, 255));
+            shineRadius = (int)random(5, 22);
+            shineSpeed = random(0.001f, 0.02f);
+            shineAmplitude = random(2, 0.8f * shineRadius);
         }
 
         void draw() {
