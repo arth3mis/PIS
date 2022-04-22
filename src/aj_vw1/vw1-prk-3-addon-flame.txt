@@ -1,0 +1,40 @@
+void setup() {
+  size(400, 400);
+  noStroke();
+}
+
+int a = 100;
+float x = 190;
+float s = 0.6;
+float t = 0;
+
+void draw() {
+  background(0);
+  t += 0.4;
+  x = 190 + (sin(t)-0.5) * 5;
+  
+  a = 100;
+  fill(255,100,0);
+  beginShape();
+  curveVertex(200,a+x);
+  curveVertex(200,a+x);
+  curveVertex(150,a+50);
+  curveVertex(200,a);
+  curveVertex(250,a+50);
+  curveVertex(200,a+x);
+  curveVertex(200,a+x);
+  endShape();
+  
+  x = 190 + (sin(0.9*t+2)-0.5) * 5;
+  a = 110;
+  fill(255,200,10);
+  beginShape();
+  curveVertex(200,a+s*x);
+  curveVertex(200,a+s*x);
+  curveVertex(200-s*50,a+s*50);
+  curveVertex(200,a);
+  curveVertex(200+s*50,a+s*50);
+  curveVertex(200,a+s*x);
+  curveVertex(200,a+s*x);
+  endShape();
+}
