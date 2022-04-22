@@ -13,8 +13,10 @@ public class ArtSketch extends PApplet {
     int blinkTimer;
     Tree tree;
 
+    static final float mouseMass = 9f;
+
     PVector shake = new PVector(0, 0);
-    static final float shakeAmount = 1.8f;
+    static final float shakeAmount = 1.9f;
     float t = 0;
 
 
@@ -30,7 +32,7 @@ public class ArtSketch extends PApplet {
     };
 
     public void settings() {
-        size(800, 700);
+        size(1000, 900);
     }
 
     public void setup() {
@@ -79,7 +81,7 @@ public class ArtSketch extends PApplet {
             s.reverseBlink = false;
             s.blinkSpeed = random(0.03f, 0.06f);
             s.blinking = s.blinkSpeed/10;
-            blinkTimer = round(random(frameRate/2, frameRate*2));
+            blinkTimer = round(random(frameRate/3, frameRate*1.5f));
         }
         tree.update();
     }
@@ -92,7 +94,7 @@ public class ArtSketch extends PApplet {
         float MAX_Y;
         PVector p;
         PVector v;
-        float speed = 0.17f;
+        float speed = 0.37f;
 
         static final float treeOffsetX = 161;
         static final float treeOffsetY = 205;
@@ -115,17 +117,17 @@ public class ArtSketch extends PApplet {
             // Flame size
             if (keyPressed && key == CODED) {
                 if (keyCode == UP) {
-                    if (tree.flameSize < 0.98f) tree.flameSize += (1 - tree.flameSize) * 0.05f;
+                    if (tree.flameSize < 0.98f) tree.flameSize += (1 - tree.flameSize) * 0.06f;
                     else if (tree.flameSize < 1f) tree.flameSize = 1f;
                     tree.v.y -= tree.speed;
                 }
                 if (keyCode == DOWN) {
                     if (tree.flameSize > 0.02f) tree.flameSize -= tree.flameSize * 0.4f;
                     else if (tree.flameSize > 0f) tree.flameSize = 0f;
-                    tree.v.y += 0.5*tree.speed;
+                    tree.v.y += 4*tree.speed;
                 }
             } else {
-                if (tree.flameSize > 0.02f) tree.flameSize -= tree.flameSize * 0.04f;
+                if (tree.flameSize > 0.02f) tree.flameSize -= tree.flameSize * 0.05f;
                 else if (tree.flameSize > 0f) tree.flameSize = 0f;
             }
 
@@ -168,7 +170,7 @@ public class ArtSketch extends PApplet {
         void update() {
             // If not on Ground: Gravity
             if (p.y < MAX_Y) {
-                v.y += 0.07f;
+                v.y += 0.25f;
             }
 
             p.add(v);
@@ -219,6 +221,11 @@ public class ArtSketch extends PApplet {
 
         void draw() {
             noStroke();
+            int tempShineRadius = (int) (shineRadius + shineAmplitude * sin(shineSpeed*t));
+            for (int i = 0; i < tempShineRadius; i++) {
+                fill(red(colour), green(colour), blue(colour),  50f/(tempShineRadius+1f));
+                ellipse(p.x, p.y, 2*radius+i, 2*radius+i);
+            }
             fill(colour);
             ellipse(p.x + shake.x, p.y + shake.y, radius*2, radius*2);
             if (blinking > 0)
@@ -271,6 +278,14 @@ public class ArtSketch extends PApplet {
             if (blinking > 2) blinking = 0;
             if (blinking > 1) reverseBlink = true;
             if (blinking > 0) blinking += blinkSpeed;
+
+            if (mousePressed) {
+                float distance = dist(p.x, p.y, mouseX, mouseY) + 1f;
+                v.add(mouseMass * (mouseX - p.x) / (distance * distance), mouseMass * (mouseY - p.y) / (distance * distance));
+            }
+
+            v.mult(0.995f);
+
             // collision with wall?
             if (p.x <= border + radius) {
                 p.x = border + radius;
