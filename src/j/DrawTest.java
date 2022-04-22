@@ -1,4 +1,4 @@
-package aj_vw1;
+package j;
 
 import processing.core.PApplet;
 
