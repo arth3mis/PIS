@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+// https://gist.github.com/denkspuren/0abca660e8c483e8b022dad6bdc54109v
+//
 public class Nim implements NimGame {
     private Random r = new Random();
     public int[] rows;

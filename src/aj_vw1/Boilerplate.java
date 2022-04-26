@@ -3,6 +3,9 @@ package aj_vw1;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Boilerplate extends PApplet {
 
     public static void main(String[] args) {
@@ -13,6 +16,7 @@ public class Boilerplate extends PApplet {
     public void settings() {
         //fullScreen();
         size(800, 450);
+        smooth(8);
     }
 
     // variables
@@ -22,12 +26,11 @@ public class Boilerplate extends PApplet {
     @Override
     public void setup() {
         frameRate(60);
-        smooth(8);
     }
 
     @Override
     public void draw() {
-        println(mouseX, mouseY);
+
     }
 
     @Override
@@ -54,11 +57,13 @@ public class Boilerplate extends PApplet {
     }
 
     boolean[] keyPressed = new boolean[1000];
+    Map<Integer, Boolean> keyTriggered = new HashMap<>();
 
     @Override
     public void keyPressed() {
         if (key == CODED) {
             keyPressed[keyCode] = true;
+            keyTriggered.replace(keyCode, true);
         }
     }
 
