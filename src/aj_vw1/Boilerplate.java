@@ -33,20 +33,31 @@ public class Boilerplate extends PApplet {
 
     }
 
+    final int LMB = 0, RMB = 1, XMB = 2;
+    boolean[] mousePressed = new boolean[3];
+    Map<Integer, Boolean> mouseTriggered = new HashMap<>();
+
     @Override
     public void mousePressed() {
-        if (mouseButton == LEFT) {
-            println("LMB");
-        } else if (mouseButton == RIGHT) {
-            println("RMB");
-        } else {
-            println("?MB");
-        }
+        handleMouse(true);
     }
 
     @Override
     public void mouseReleased() {
+        handleMouse(false);
+    }
 
+    void handleMouse(boolean b) {
+        if (mouseButton == LEFT) {
+            mousePressed[LMB] = b;
+            mouseTriggered.replace(LMB, b);
+        } else if (mouseButton == RIGHT) {
+            mousePressed[RMB] = b;
+            mouseTriggered.replace(RMB, b);
+        } else {
+            mousePressed[XMB] = b;
+            mouseTriggered.replace(XMB, b);
+        }
     }
 
     float mouseWheelDelta = 0;
