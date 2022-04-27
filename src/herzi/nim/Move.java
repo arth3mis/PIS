@@ -1,9 +1,9 @@
 package herzi.nim;
 
 public class Move {
-    final int row, number;
+    public final int row, number;
 
-    static Move of(int row, int number) {
+    public static Move of(int row, int number) {
         return new Move(row, number);
     }
 

@@ -64,6 +64,9 @@ public class Boilerplate extends PApplet {
         if (key == CODED) {
             keyPressed[keyCode] = true;
             keyTriggered.replace(keyCode, true);
+        } else {
+            keyPressed[key] = true;
+            keyTriggered.replace((int) key, true);
         }
     }
 
@@ -71,6 +74,8 @@ public class Boilerplate extends PApplet {
     public void keyReleased() {
         if (key == CODED) {
             keyPressed[keyCode] = false;
+        } else {
+            keyPressed[key] = false;
         }
     }
 }
