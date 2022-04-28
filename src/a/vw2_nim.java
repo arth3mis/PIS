@@ -61,32 +61,37 @@ public class vw2_nim extends PApplet {
         btnRemove = new Button(-0.04f, -0.02f, -0.2f, -0.05f, ' ');
     }
 
-    void gameOver() {
-
-    }
-
     void update() {
-        if (keyTriggered.get((int)BACKSPACE)) {
-            keyTriggered.replace((int)BACKSPACE, false);
+        if (processKeyTrigger(BACKSPACE)) {
             resetGame();
         }
-        if (keyTriggered.get(btnRemove.assignedKey)) {
-            keyTriggered.replace(btnRemove.assignedKey, false);
+        if (processKeyTrigger(btnRemove.assignedKey)) {
             btnRemove.triggered = true;
         }
-
-
-
-        // mouse hover
-        boolean mouseHover = false;
-        for (Stick s : sticks) {
-            s.update();
-            if (s.hover(mouseX, mouseY)) {
-                stickHovered = s;
-                mouseHover = true;
-            }
+        // arrow keys
+        int[] moveHovered = {0, 0};
+        if (processKeyTrigger(UP)) {
+            moveHovered[0]--;
         }
-        mouseHover = btnRemove.hover(mouseX, mouseY);
+        if (processKeyTrigger(LEFT)) {
+            moveHovered[1]--;
+        }
+        if (processKeyTrigger(DOWN)) {
+            moveHovered[0]++;
+        }
+        if (processKeyTrigger(RIGHT)) {
+            moveHovered[1]++;
+        }
+
+        if (mouseMovedAfterKey) {
+            Stick s = field.checkHover(mouseX, mouseY);
+            field.setStickHovered(s);
+        } else {
+            field.moveStickHovered(moveHovered);
+        }
+
+        btnRemove.hover(mouseX, mouseY);
+
 
 
 
@@ -108,12 +113,12 @@ public class vw2_nim extends PApplet {
         }
 
 
-        if (mouseHover)
-            toggleSelectHovered();
-        // reset select row
-        if (Arrays.stream(sticks).noneMatch(s -> s.selected))
-            selectRow = -1;
-        field.update(mouseX, mouseY);
+//        if (mouseHover)
+//            toggleSelectHovered();
+//        // reset select row
+//        if (Arrays.stream(sticks).noneMatch(s -> s.selected))
+//            selectRow = -1;
+//        field.update(mouseX, mouseY);
     }
 
     @Override
@@ -160,11 +165,20 @@ public class vw2_nim extends PApplet {
             }
         }
 
+        void setStickHovered(Stick s) {
+            stickHoveredPrev = stickHovered;
+            stickHovered = s;
+        }
+
+        void moveStickHovered(int[] m) {
+
+        }
+
         void toggleSelectHovered() {
-            if (stickHovered != null && (stickHovered.row == selectRow || selectRow == -1)) {
-                stickHovered.selected = !stickHovered.selected;
-                selectRow = stickHovered.row;
-            }
+//            if (stickHovered != null && (stickHovered.row == selectRow || selectRow == -1)) {
+//                stickHovered.selected = !stickHovered.selected;
+//                selectRow = stickHovered.row;
+//            }
         }
 
         void removeSelected(int selectRow) {
@@ -183,12 +197,16 @@ public class vw2_nim extends PApplet {
             });
         }
 
-        void update(float mouseX, float mouseY) {
-
+        Stick checkHover(float mouseX, float mouseY) {
+            return null;
         }
 
         void draw() {
-            Arrays.stream(sticks).forEach(row -> Arrays.stream(row).forEach(Stick::draw));
+            for (int i = 0; i < sticks.length; i++) {
+                for (int j = 0; j < sticks[i].length; j++) {
+                    sticks[i][j].draw(sticks[i][j] == stickHovered, i == selectRow);
+                }
+            }
             btnRemove.draw();
         }
     }
@@ -225,11 +243,12 @@ public class vw2_nim extends PApplet {
             }
         }
 
-        void draw() {
+        void draw(boolean hovered, boolean legalMove) {
             noStroke();
-            fill(hovered ? (selected ? colourHoverSelected : colourHover) : (selected ? colourSelected : borderColour), removeAnimation*255);
-            if (hovered && selectRow != -1 && selectRow != row)
-                fill(colourHoverIllegal);
+            fill(hovered ?
+                    (selected ? colourHoverSelected : (legalMove ? colourHover : colourHoverIllegal)) :
+                    (selected ? colourSelected : borderColour),
+                    removeAnimation*255);
             rect(pos.x * width, pos.y * height, size.x * width, size.y * height);
             fill(colour, removeAnimation*255);
             rect((pos.x + size.x*borderPercent) * width, (pos.y + size.x*borderPercent) * height,
@@ -317,6 +336,14 @@ public class vw2_nim extends PApplet {
 
     boolean[] keyPressed = new boolean[1000];
     Map<Integer, Boolean> keyTriggered = new HashMap<>();
+
+    boolean processKeyTrigger(int n) {
+        if (keyTriggered.get(n)) {
+            keyTriggered.replace(n, false);
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void keyPressed() {
