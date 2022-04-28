@@ -9,6 +9,7 @@ import processing.core.PVector;
 import processing.event.MouseEvent;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 class vw2_nim extends PApplet {
 
@@ -19,29 +20,39 @@ class vw2_nim extends PApplet {
     @Override
     public void settings() {
         //fullScreen();
-        size(600, 700);
+        size(800, 900);
         smooth(8);
     }
 
     // variables
     //
+    int rowChoice, maxColumns;
     int[] gameRows;
     NimGame game;
-    int selectRow;
+    boolean botPlayer2, botBestMove;
+    int turn;
     int winner;
     Field field;
     Button btnRemove;
+    List<Button> buttons;
 
+    PFont winnerFont;
     int colourHover = color(250, 235, 215);
-    int colourHoverIllegal = color(100, 110, 120);
-    int colourHoverSelected = color(255, 99, 71);
+    int colourHoverIllegal = color(50, 110, 120);
+    int colourHoverSelected = color(240, 30, 10);
     int colourSelected = color(139, 0, 0);
+    // sticks
+    int borderColour = color(150, 82, 45);//color(139, 69, 19);
+    int stickColour = color(205, 133, 63);
 
     @Override
     public void setup() {
         frameRate(60);
-        resetGame();
-        // setup trigger keys
+        winnerFont = createFont("Serif.bolditalic", 50);
+        buttons = new ArrayList<>();
+        btnRemove = new Button(-0.04f, -0.02f, -0.2f, -0.05f, ENTER);
+        buttons.add(btnRemove);
+        // setup input triggers
         keyTriggered.put(UP, false);
         keyTriggered.put(DOWN, false);
         keyTriggered.put(LEFT, false);
@@ -49,79 +60,95 @@ class vw2_nim extends PApplet {
         keyTriggered.put((int)' ', false);
         keyTriggered.put((int)ENTER, false);
         keyTriggered.put((int)BACKSPACE, false);
+        keyTriggered.put((int)'r', false);
+        keyTriggered.put((int)'p', false);
+        keyTriggered.put((int)'1', false);
+        keyTriggered.put((int)'2', false);
+        keyTriggered.put((int)'3', false);
+        keyTriggered.put((int)'4', false);
+        keyTriggered.put((int)'5', false);
+        keyTriggered.put((int)'6', false);
+        keyTriggered.put((int)'7', false);
+        keyTriggered.put((int)'8', false);
+        keyTriggered.put((int)'9', false);
+        keyTriggered.put(SHIFT, false);
+        mouseTriggered.put(LMB, false);
+
+        rowChoice = 4;
+        maxColumns = 5;
+        botPlayer2 = true;
+        botBestMove = true;
+        resetGame();
     }
 
     void resetGame() {
-        gameRows = Nim.randomSetup(5,5,5,5);
+        int[] setup = new int[rowChoice];
+        Arrays.fill(setup, maxColumns);
+        gameRows = Nim.randomSetup(setup);
         game = Nim.of(gameRows);
-        selectRow = -1;
+        turn = 0;
         winner = -1;
         // display
         field = new Field(gameRows);
-        btnRemove = new Button(-0.04f, -0.02f, -0.2f, -0.05f, ' ');
     }
 
     void update() {
-        if (processKeyTrigger(BACKSPACE)) {
+        if (processKeyTrigger(BACKSPACE))
             resetGame();
-        }
-        if (processKeyTrigger(btnRemove.assignedKey)) {
+        if (processKeyTrigger(btnRemove.assignedKey))
             btnRemove.triggered = true;
+        if (processKeyTrigger('p'))
+            if (turn == 0) botPlayer2 = !botPlayer2;
+        if (processKeyTrigger('r'))
+            botBestMove = !botBestMove;
+        for (int i = '1'; i <= '9'; i++) {
+            if (processKeyTrigger(i)) {
+                if (processKeyTrigger(SHIFT))
+                    maxColumns = i - '0';
+                else
+                    rowChoice = i - '0';
+            }
         }
         // arrow keys
-        int[] moveHovered = {0, 0};
-        if (processKeyTrigger(UP)) {
-            moveHovered[0]--;
+        int[] keyMoves = {0, 0};
+        if (processKeyTrigger(UP))
+            keyMoves[0]--;
+        if (processKeyTrigger(LEFT))
+            keyMoves[1]--;
+        if (processKeyTrigger(DOWN))
+            keyMoves[0]++;
+        if (processKeyTrigger(RIGHT))
+            keyMoves[1]++;
+        // update field with input
+        field.update(mouseX, mouseY, keyMoves);
+        // update buttons
+        boolean lmb = processMouseTrigger(LMB);
+        for (Button b : buttons)
+            if (b.update(mouseX, mouseY, lmb))
+                lmb = false;
+        // select stick
+        if (lmb || processKeyTrigger(' ')) {
+            field.toggleSelected();
         }
-        if (processKeyTrigger(LEFT)) {
-            moveHovered[1]--;
-        }
-        if (processKeyTrigger(DOWN)) {
-            moveHovered[0]++;
-        }
-        if (processKeyTrigger(RIGHT)) {
-            moveHovered[1]++;
-        }
-
-        if (mouseMovedAfterKey) {
-            Stick s = field.checkHover(mouseX, mouseY);
-            field.setStickHovered(s);
-        } else {
-            field.moveStickHovered(moveHovered);
-        }
-
-        btnRemove.checkHover(mouseX, mouseY);
-
-
-        // mouse click
-        if (processMouseTrigger(LMB))
-            ;
-
-
-        // remove button
-        if (btnRemove.triggered) {
+        // remove selected (game logic + display)
+        if (btnRemove.triggered && winner == -1 && field.playerMove != null) {
             btnRemove.triggered = false;
-            game = game.play(Move.of(selectRow, field.selectCount));
-            field.removeSelected(selectRow);
-            if (game.isGameOver())
-                winner = 0;
-            else {
-                // computer move
-                Move m = game.bestMove();
+            game = game.play(field.playerMove);
+            field.removeSelected();
+            field.playerMove = null;
+            if (game.isGameOver()) {
+                winner = turn;
+            } else if (botPlayer2) {
+                Move m = botBestMove ? game.bestMove() : game.randomMove();
                 game = game.play(m);
                 field.removeRandom(m);
                 if (game.isGameOver())
                     winner = 1;
+            } else {
+                turn = 1 - turn;
             }
-        }
-
-
-//        if (mouseHover)
-//            toggleSelectHovered();
-//        // reset select row
-//        if (Arrays.stream(sticks).noneMatch(s -> s.selected))
-//            selectRow = -1;
-//        field.update(mouseX, mouseY);
+        } else if (btnRemove.triggered)
+            btnRemove.triggered = false;
     }
 
     @Override
@@ -129,13 +156,40 @@ class vw2_nim extends PApplet {
         update();
         background(222, 184, 135);
         field.draw();
+        buttons.forEach(Button::draw);
+        drawInfo();
+        if (winner >= 0)
+            drawWinner();
+    }
+
+    void drawInfo() {
+        fill(borderColour);
+        textFont(winnerFont, 0.04f * width);
+        float x = 0.02f * width, y = 0.05f * width;
+        if (!botPlayer2)
+            text("Turn: player "+(turn+1), x, y);
+        else if (!botBestMove)
+            text("Bot: random move", x, y);
+    }
+
+    void drawWinner() {
+        float sy = 0.2f;
+        String t1 = "Player "+(winner+1)+(winner == 1 && botPlayer2 ? " (bot)" : "")+" won!";
+        String t2 = "Press [Backspace] to restart";
+        fill(borderColour);
+        textFont(winnerFont, 0.4f*sy*height);
+        text(t1, width/2f - textWidth(t1)/2, height/2f - 0.05f*sy*height);
+        float t2Size = 0.2f*sy*height;
+        textFont(winnerFont, t2Size);
+        text(t2, width/2f - textWidth(t2)/2, height/2f + 0.05f*sy*height + t2Size);
     }
 
 
     class Field {
         Stick[][] sticks;
-        Stick stickHovered, stickHoveredPrev;  // changed by mouse/keys
-        int selectCount;
+        Stick stickHovered;  // mouse
+        Stick stickActive, stickActivePrev;  // mouse & keyboard
+        Move playerMove;
 
         Field(int[] rows) {
             // display values
@@ -145,7 +199,6 @@ class vw2_nim extends PApplet {
             float yStickSize = yStickSpace * 0.85f;
             float xStickSize = yStickSize * 0.35f;
             float xStickSpace = xStickSize * 1.8f;
-
             // check width
             for (int row : rows) {
                 while (xStickSpace > xStickSize * 1.01f &&
@@ -153,40 +206,84 @@ class vw2_nim extends PApplet {
                     xStickSpace -= xStickSize * 0.01f;
                 }
             }
-
             // init sticks
             sticks = new Stick[rows.length][];
             for (int i = 0; i < rows.length; i++) {
                 sticks[i] = new Stick[rows[i]];
                 float xWidth = xStickSpace * rows[i] - (xStickSpace - xStickSize);  // check with formula above
                 for (int j = 0; j < rows[i]; j++) {
-                    sticks[i][j] = new Stick(
+                    sticks[i][j] = new Stick(i, j,
                             0.5f - xWidth / 2 + xStickSpace * j,
                             yPadding + yStickSpace * i,
                             xStickSize, yStickSize,
                             0.15f);
                 }
             }
+            stickActivePrev = sticks[0][0];
+            playerMove = null;
         }
 
-        void setStickHovered(Stick s) {
-            stickHoveredPrev = stickHovered;
-            stickHovered = s;
+        void update(float mouseX, float mouseY, int[] keyMoves) {
+            stickHovered = null;
+            // loop sticks
+            out: for (Stick[] stick : sticks) {
+                for (Stick s : stick) {
+                    s.update();
+                    // mouse hover
+                    if (s.checkHovered(mouseX, mouseY)) {
+                        stickHovered = s;
+                        break out;
+                    }
+                }
+            }
+            // mouse overwrites keyboard?
+            if (mouseMovedAfterKey && stickHovered != stickActive) {
+                stickActivePrev = stickActive;
+                stickActive = stickHovered;
+                return;
+            }
+            // keyboard
+            if ((keyMoves[0] != 0 || keyMoves[1] != 0) && winner == -1) {
+                if (stickActive == null) {
+                    stickActive = stickActivePrev;
+                } else {
+                    int newRow = min(sticks.length - 1, max(0, stickActive.row + keyMoves[0]));
+                    int newCol = min(sticks[newRow].length - 1, max(0, stickActive.col + keyMoves[1]));
+                    // do not select removed sticks
+                    while (sticks[newRow][newCol].removed) {
+                        newCol--;
+                        if (newCol < 0) {
+                            newRow = (newRow + 1) % sticks.length;
+                            newCol = sticks[newRow].length - 1;
+                        }
+                    }
+                    stickActive = sticks[newRow][newCol];
+                }
+            }
         }
 
-        void moveStickHovered(int[] m) {
-
+        void toggleSelected() {
+            if (stickActive == null)
+                return;
+            // deselect
+            if (stickActive.selected) {
+                stickActive.selected = false;
+                if (playerMove.number == 1)
+                    playerMove = null;
+                else
+                    playerMove = Move.of(stickActive.row, playerMove.number - 1);
+            }
+            // select
+            else {
+                if (playerMove == null || playerMove.row == stickActive.row) {
+                    stickActive.selected = true;
+                    playerMove = Move.of(stickActive.row, playerMove == null ? 1 : playerMove.number + 1);
+                }
+            }
         }
 
-        void toggleSelectHovered() {
-//            if (stickHovered != null && (stickHovered.row == selectRow || selectRow == -1)) {
-//                stickHovered.selected = !stickHovered.selected;
-//                selectRow = stickHovered.row;
-//            }
-        }
-
-        void removeSelected(int selectRow) {
-            Arrays.stream(sticks[selectRow]).filter(s -> s.selected).forEach(s -> {
+        void removeSelected() {
+            Arrays.stream(sticks[playerMove.row]).filter(s -> s.selected).forEach(s -> {
                 s.selected = false;
                 s.removed = true;
             });
@@ -201,44 +298,36 @@ class vw2_nim extends PApplet {
             });
         }
 
-        Stick checkHover(float mouseX, float mouseY) {
-            for (Stick[] stick : sticks) {
-                for (Stick s : stick) {
-                    if (s.checkHovered(mouseX, mouseY))
-                        return s;
-                }
-            }
-            return null;
-        }
-
         void draw() {
             for (int i = 0; i < sticks.length; i++) {
                 for (int j = 0; j < sticks[i].length; j++) {
-                    sticks[i][j].draw(sticks[i][j] == stickHovered, i == selectRow);
+                    sticks[i][j].draw(sticks[i][j] == stickActive, playerMove == null || i == playerMove.row);
                 }
             }
-            btnRemove.draw();
         }
     }
 
 
     class Stick {
         // logic
+        int row, col;
         boolean selected;
         boolean removed;
         // display
         PVector pos;
         PVector size;  // includes border
         float borderPercent;  // border size relative to size.x
-        int colour = color(205, 133, 63);
-        int borderColour = color(150, 82, 45);//color(139, 69, 19);
+        int colour;
         float removeAnimation;
 
-        Stick(float x, float y, float sx, float sy, float borderPercent) {
+        Stick(int row, int col, float x, float y, float sx, float sy, float borderPercent) {
+            this.row = row;
+            this.col = col;
             pos = new PVector(x, y);
             size = new PVector(sx, sy);
             this.borderPercent = borderPercent;
             removeAnimation = 1;
+            colour = stickColour + (round(random(-20, 10)) << 16);
         }
 
         boolean checkHovered(float mouseX, float mouseY) {
@@ -286,8 +375,11 @@ class vw2_nim extends PApplet {
             fontBtn = createFont("Arial black", size.y * height * 0.7f);
         }
 
-        boolean checkHover(float mouseX, float mouseY) {
-            return hovered = mouseX >= pos.x * width && mouseX < (pos.x + size.x) * width && mouseY >= pos.y * height && mouseY < (pos.y + size.y) * height;
+        boolean update(float mouseX, float mouseY, boolean triggered) {
+            hovered = mouseX >= pos.x * width && mouseX < (pos.x + size.x) * width &&
+                             mouseY >= pos.y * height && mouseY < (pos.y + size.y) * height;
+            if (hovered) this.triggered = triggered;
+            return hovered;
         }
 
         void draw() {
@@ -310,7 +402,7 @@ class vw2_nim extends PApplet {
     boolean mouseMovedAfterKey = true;
 
     boolean processMouseTrigger(int n) {
-        if (mouseTriggered.get(n)) {
+        if (mouseTriggered.containsKey(n) && mouseTriggered.get(n)) {
             mouseTriggered.replace(n, false);
             return true;
         }
@@ -356,7 +448,7 @@ class vw2_nim extends PApplet {
     Map<Integer, Boolean> keyTriggered = new HashMap<>();
 
     boolean processKeyTrigger(int n) {
-        if (keyTriggered.get(n)) {
+        if (keyTriggered.containsKey(n) && keyTriggered.get(n)) {
             keyTriggered.replace(n, false);
             return true;
         }

@@ -37,6 +37,14 @@ public class Boilerplate extends PApplet {
     boolean[] mousePressed = new boolean[3];
     Map<Integer, Boolean> mouseTriggered = new HashMap<>();
 
+    boolean processMouseTrigger(int n) {
+        if (mouseTriggered.containsKey(n) && mouseTriggered.get(n)) {
+            mouseTriggered.replace(n, false);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void mousePressed() {
         handleMouse(true);
@@ -69,6 +77,14 @@ public class Boilerplate extends PApplet {
 
     boolean[] keyPressed = new boolean[1000];
     Map<Integer, Boolean> keyTriggered = new HashMap<>();
+
+    boolean processKeyTrigger(int n) {
+        if (keyTriggered.containsKey(n) && keyTriggered.get(n)) {
+            keyTriggered.replace(n, false);
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void keyPressed() {
