@@ -57,7 +57,7 @@ public class Nim implements NimGame {
     }
     public Nim play(Move... moves) {
         Nim nim = this;
-        for(Move m : moves) nim = play(m);
+        for(Move m : moves) nim = nim.play(m);
         return nim;
     }
     public Move randomMove() {
