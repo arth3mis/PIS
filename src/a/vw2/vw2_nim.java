@@ -1,4 +1,4 @@
-package a;
+package a.vw2;
 
 import herzi.nim.Move;
 import herzi.nim.Nim;
@@ -10,7 +10,7 @@ import processing.event.MouseEvent;
 
 import java.util.*;
 
-public class vw2_nim extends PApplet {
+class vw2_nim extends PApplet {
 
     public static void main(String[] args) {
         PApplet.runSketch(new String[]{""}, new vw2_nim());
@@ -90,9 +90,12 @@ public class vw2_nim extends PApplet {
             field.moveStickHovered(moveHovered);
         }
 
-        btnRemove.hover(mouseX, mouseY);
+        btnRemove.checkHover(mouseX, mouseY);
 
 
+        // mouse click
+        if (processMouseTrigger(LMB))
+            ;
 
 
         // remove button
@@ -199,6 +202,12 @@ public class vw2_nim extends PApplet {
         }
 
         Stick checkHover(float mouseX, float mouseY) {
+            for (Stick[] stick : sticks) {
+                for (Stick s : stick) {
+                    if (s.checkHovered(mouseX, mouseY))
+                        return s;
+                }
+            }
             return null;
         }
 
@@ -232,7 +241,7 @@ public class vw2_nim extends PApplet {
             removeAnimation = 1;
         }
 
-        boolean isHovered(float mouseX, float mouseY) {
+        boolean checkHovered(float mouseX, float mouseY) {
             if (removed) return false;
             return mouseX >= pos.x * width && mouseX < (pos.x+size.x) * width &&
                    mouseY >= pos.y * height && mouseY < (pos.y+size.y) * height;
@@ -277,7 +286,7 @@ public class vw2_nim extends PApplet {
             fontBtn = createFont("Arial black", size.y * height * 0.7f);
         }
 
-        boolean hover(float mouseX, float mouseY) {
+        boolean checkHover(float mouseX, float mouseY) {
             return hovered = mouseX >= pos.x * width && mouseX < (pos.x + size.x) * width && mouseY >= pos.y * height && mouseY < (pos.y + size.y) * height;
         }
 
@@ -299,6 +308,14 @@ public class vw2_nim extends PApplet {
     boolean[] mousePressed = new boolean[3];
     Map<Integer, Boolean> mouseTriggered = new HashMap<>();
     boolean mouseMovedAfterKey = true;
+
+    boolean processMouseTrigger(int n) {
+        if (mouseTriggered.get(n)) {
+            mouseTriggered.replace(n, false);
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void mousePressed() {
