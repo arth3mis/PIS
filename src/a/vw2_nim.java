@@ -154,6 +154,7 @@ public class vw2_nim extends PApplet {
             // init sticks
             sticks = new Stick[rows.length][];
             for (int i = 0; i < rows.length; i++) {
+                sticks[i] = new Stick[rows[i]];
                 float xWidth = xStickSpace * rows[i] - (xStickSpace - xStickSize);  // check with formula above
                 for (int j = 0; j < rows[i]; j++) {
                     sticks[i][j] = new Stick(
