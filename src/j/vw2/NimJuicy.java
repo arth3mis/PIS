@@ -622,8 +622,6 @@ public class NimJuicy extends PApplet {
                 pos.y = 2 * height - 2 * 32 - pos.y;
                 vel.y *= -1;
             }
-
-            Integer.rotateLeft()
         }
 
         @Override

@@ -36,10 +36,11 @@ class NimGUI extends PApplet {
     List<Button> buttons;
 
     PFont winnerFont;
+    float winnerAnimation;
     int colourHover = color(250, 235, 215);
     int colourHoverIllegal = color(50, 110, 120);
     int colourHoverSelected = color(240, 30, 10);
-    int colourSelected = color(139, 0, 0);
+    int colourSelected = 0xff8b0000;
     // sticks
     int borderColour = color(150, 82, 45);//color(139, 69, 19);
     int stickColour = color(205, 133, 63);
@@ -89,6 +90,7 @@ class NimGUI extends PApplet {
         winner = -1;
         // display
         field = new Field(gameRows);
+        winnerAnimation = -1;
     }
 
     void update() {
@@ -175,7 +177,8 @@ class NimGUI extends PApplet {
         float sy = 0.2f;
         String t1 = "Player "+(winner+1)+(winner == 1 && botPlayer2 ? " (bot)" : "")+" won!";
         String t2 = "Press [Backspace] to restart";
-        fill(borderColour);
+        winnerAnimation = min(1, winnerAnimation + 0.03f);
+        fill(borderColour, max(0, winnerAnimation * 255));
         textFont(winnerFont, 0.4f*sy*height);
         text(t1, width/2f - textWidth(t1)/2, height/2f - 0.05f*sy*height);
         float t2Size = 0.2f*sy*height;
@@ -250,10 +253,13 @@ class NimGUI extends PApplet {
                     int newCol = min(sticks[newRow].length - 1, max(0, stickActive.col + keyMoves[1]));
                     // do not select removed sticks
                     while (sticks[newRow][newCol].removed) {
-                        newCol--;
-                        if (newCol < 0) {
-                            newRow = (newRow + 1) % sticks.length;
-                            newCol = sticks[newRow].length - 1;
+                        if (keyMoves[0] != 0) {
+                            newRow = (newRow + keyMoves[0] + sticks.length) % sticks.length;
+                            while (sticks[newRow][newCol].removed)
+                                newCol = (newCol + 1 + sticks[newRow].length) % sticks[newRow].length;
+                        }
+                        if (keyMoves[1] != 0) {
+                            newCol = (newCol + keyMoves[1] + sticks[newRow].length) % sticks[newRow].length;
                         }
                     }
                     stickActive = sticks[newRow][newCol];
@@ -294,6 +300,7 @@ class NimGUI extends PApplet {
             ls.stream().limit(m.number).forEach(s -> {
                 s.selected = false;
                 s.removed = true;
+                s.removeAnimation *= 2;
             });
         }
 

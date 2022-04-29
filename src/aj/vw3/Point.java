@@ -7,24 +7,11 @@ class Point {
         this.y = y;
     }
     @Override
-    public boolean equals(Object other) { 1
+    public boolean equals(Object other) {
         if (other == null) return false; // Null abwehren!
         if (other == this) return true; // Bin ich's selbst?
         if (other.getClass() != getClass()) return false; // Andere Klasse?
         Point that = (Point)other; // Casting
         return this.x == that.x && this.y == that.y; // Was definiert Gleichheit?
-    }
-}
-
-class subPoint extends Point {
-
-    subPoint(double x, double y) {
-        super(x, y);
-    }
-}
-
-public class scratch {
-    public static void main(String[] args) {
-        Point point = new Point();
     }
 }
