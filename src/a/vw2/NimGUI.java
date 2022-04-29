@@ -9,12 +9,11 @@ import processing.core.PVector;
 import processing.event.MouseEvent;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
-class vw2_nim extends PApplet {
+class NimGUI extends PApplet {
 
     public static void main(String[] args) {
-        PApplet.runSketch(new String[]{""}, new vw2_nim());
+        PApplet.runSketch(new String[]{""}, new NimGUI());
     }
 
     @Override
