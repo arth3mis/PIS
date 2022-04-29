@@ -1,4 +1,4 @@
-package aj_vw1;
+package aj.vw1;
 
 import processing.core.PApplet;
 import processing.event.MouseEvent;
@@ -47,7 +47,6 @@ public class Boilerplate extends PApplet {
 
     @Override
     public void mousePressed() {
-        println(mouseButton);
         handleMouse(true);
     }
 

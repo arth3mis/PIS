@@ -354,6 +354,7 @@ class NimGUI extends PApplet {
         }
     }
 
+
     class Button {
         // logic
         boolean hovered;
@@ -394,6 +395,9 @@ class NimGUI extends PApplet {
             text(t, (pos.x + size.x / 2) * width - textWidth(t) / 2, (pos.y + size.y * 0.8f) * height);
         }
     }
+
+
+
 
     final int LMB = 0, RMB = 1, XMB = 2;
     boolean[] mousePressed = new boolean[3];

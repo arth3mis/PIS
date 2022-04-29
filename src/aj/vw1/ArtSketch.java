@@ -1,4 +1,4 @@
-package aj_vw1;
+package aj.vw1;
 
 import processing.core.*;
 
