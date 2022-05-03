@@ -19,6 +19,9 @@
     color: #006699;
     color: #669900;
     color: #006699;
+    /*literal*/
+    color: #6a8759;
+    color: #718a62; color: #9876aa;
     /**/
     color: #122535;
     color: #587478;
@@ -35,4 +38,21 @@
     color: #214282;
     color: #132638;
     color: #122535;
+    /*toolbar.button*/
+    color: #00072B;
+    color: #BAEDFF;
+    color: #FFFFF2; color: #3c3f41;
+    color: #009BEE; color: #5c6164;
+    color: #009BEE; color: #499c54;
+    color: #FFFFF2; /*none*/
+    color: #FFFFF2;
+    color: #FFFFF2; color: #4c5052;
+    color: #003BB1; color: #499c54;
+    color: #00193D;
+    color: #FFFFF2;
+        color: #5B6165;
+    /**/
+    color: #70a0c3;
+    color: #95adb0;
+    color: #777777;
 }
