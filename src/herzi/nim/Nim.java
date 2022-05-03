@@ -14,14 +14,6 @@ public class Nim implements NimGame {
         return new Nim(rows);
     }
 
-    public static int[] randomSetup(int... maxN) {
-        Random r = new Random();
-        int[] rows = new int[maxN.length];
-        for(int i = 0; i < maxN.length; i++) {
-            rows[i] = r.nextInt(maxN[i]) + 1;
-        }
-        return rows;
-    }
 
     public static ArrayList<Move> autoplay(NimGame nim) {
         ArrayList<Move> moves = new ArrayList<>();
@@ -33,6 +25,7 @@ public class Nim implements NimGame {
         return moves;
     }
 
+    /*
     public static boolean simulateGame(int... maxN) {
         Nim nim = Nim.of(randomSetup(maxN));
         // System.out.println(nim);
@@ -42,7 +35,7 @@ public class Nim implements NimGame {
         return (NimGame.isWinning(nim.rows) && (moves.size() % 2) == 1) ||
                 (!NimGame.isWinning(nim.rows) && (moves.size() % 2) == 0);
     }
-    
+    */
     private Nim(int... rows) {
         assert rows.length >= 1;
         assert Arrays.stream(rows).allMatch(n -> n >= 0);

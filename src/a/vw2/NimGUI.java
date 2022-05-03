@@ -84,7 +84,7 @@ class NimGUI extends PApplet {
     void resetGame() {
         int[] setup = new int[rowChoice];
         Arrays.fill(setup, maxColumns);
-        gameRows = Nim.randomSetup(setup);
+        //gameRows = Nim.randomSetup(setup);
         game = Nim.of(gameRows);
         turn = 0;
         winner = -1;

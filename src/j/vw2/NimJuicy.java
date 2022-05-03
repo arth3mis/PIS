@@ -2,6 +2,7 @@ package j.vw2;
 
 import herzi.nim.Move;
 import herzi.nim.Nim;
+import herzi.nim.NimGame;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -9,6 +10,7 @@ import processing.core.PVector;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class NimJuicy extends PApplet {
@@ -18,7 +20,6 @@ public class NimJuicy extends PApplet {
     static final float STICK_DISTANCE = 64;
     static PImage CURSOR_LASSO;
     static final float ROW_HEIGHT = 135f;
-    static final int pickTime = 500;
     static final float DIFFICULTY = 1; // 1 EASY - 42 HIGH
 
     final int COLOR_ROW_HOVER = color(255f, 120);
@@ -42,7 +43,7 @@ public class NimJuicy extends PApplet {
     }
 
     ArrayList<ArrayList<Stick>> rows;
-    Nim nim;
+    NimGame nim;
     Button button;
     int moveRow;
     int moveNumber;
@@ -50,6 +51,7 @@ public class NimJuicy extends PApplet {
 
     public void settings() {
         size(900, 700);
+        //fullScreen();
         smooth(3);
     }
 
@@ -64,9 +66,15 @@ public class NimJuicy extends PApplet {
     }
 
     void startNewGame() {
+        // Generate Random Nim-Game
         rowCount = (int) random(2, 5);
         int columnCount = (int) random(2, 8);
-        nim = Nim.of(Nim.randomSetup(IntStream.generate(() -> columnCount).limit(rowCount).toArray()));
+        int[] rowArray = new int[rowCount];
+        for(int i = 0; i < rowArray.length; i++) {
+            rowArray[i] = (int) random(columnCount) + 1;
+        }
+
+        // Init values
         moveRow = -1;
         moveNumber = 0;
         playerMove = true;
@@ -75,10 +83,11 @@ public class NimJuicy extends PApplet {
 
 
         // For-Schleife in SWAG
+        // Generates new Sticks
         IntStream.range(0, rowCount).forEach(i -> {
             rows.add(i, new ArrayList<>());
-            IntStream.range(0, nim.rows[i]).forEach(j -> {
-                Stick stick = new Stick(i, new PVector(getRowX(nim.rows[i], j), getRowY(i)), colorIndex);
+            IntStream.range(0, rowArray[i]).forEach(j -> {
+                Stick stick = new Stick(i, new PVector(getRowX(rowArray[i], j), getRowY(i)), colorIndex);
                 allElements.add(stick);
                 rows.get(i).add(stick);
             });
@@ -87,6 +96,8 @@ public class NimJuicy extends PApplet {
         // Moves Button to top
         allElements.remove(button);
         allElements.add(button);
+
+        nim = Nim.of(rowArray);
     }
 
     public void mousePressed() {
@@ -296,15 +307,15 @@ public class NimJuicy extends PApplet {
                 if (prevPos != null) {
                     int dist = (int) pos.dist(prevPos);
                     PVector difference = PVector.sub(prevPos, pos).div(dist);
-                    float angleDifference = (angle - prevAngle) / dist;
+                    //float angleDifference = (angle - prevAngle) / dist;
                     fill(100);
-                    IntStream.range(0, dist).forEach(i -> {
-                        drawShape(g, PVector.add(pos, PVector.mult(difference, i)), angleDifference * i);
+                    IntStream.range(0, dist/3).forEach(i -> {
+                        drawShape(g, PVector.add(pos, PVector.mult(difference, 3 * i)), angle);
                     });
                 }
 
                 prevPos = pos.copy();
-                prevAngle = angle;
+                //prevAngle = angle;
                 //TODO tint(color(red(shadowColor), green(shadowColor), blue(shadowColor), alpha(shadowColor)));
                 fill(100);
                 drawShape(g, pos, angle);
@@ -482,7 +493,20 @@ public class NimJuicy extends PApplet {
         @Override
         void drawTail(PGraphics g) {
             if (moving) {
-                fill(255f);
+                if (prevPos != null) {
+                    int dist = (int) pos.dist(prevPos);
+                    PVector difference = PVector.sub(prevPos, pos).div(dist);
+                    //float angleDifference = (angle - prevAngle) / dist;
+                    fill(100);
+                    IntStream.range(0, dist/3).forEach(i -> {
+                        g.circle(pos.x + 3 * i * difference.x, pos.y + 3 * i * difference.y, 2 * radius);
+                    });
+                }
+
+                prevPos = pos.copy();
+                //prevAngle = angle;
+                //TODO tint(color(red(shadowColor), green(shadowColor), blue(shadowColor), alpha(shadowColor)));
+                fill(100);
                 g.circle(pos.x, pos.y, 2 * radius);
             }
         }
@@ -585,8 +609,10 @@ public class NimJuicy extends PApplet {
         @Override
         void draw() {
             super.draw();
+        }
 
-
+        @Override
+        void drawTail(PGraphics g) {
         }
 
         @Override
