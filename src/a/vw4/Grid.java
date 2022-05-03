@@ -1,14 +1,16 @@
 package a.vw4;
 
+import processing.core.PApplet;
+import static processing.core.PApplet.*;
+
 import java.util.Arrays;
 
-import static processing.core.PApplet.*;
 
 public class Grid {
 
     final int L;
     final int A;
-    private int[] data;
+    private final int[] data;
 
     Grid(int l) {
         L = l;
@@ -119,8 +121,8 @@ public class Grid {
      */
     void random_tile() {
         int pos, val;
-        pos = (int)random(0, free_slots());
-        val = random(0, 1) < 0.9 ? 2 : 4;
+        pos = (int)new PApplet().random(0, free_slots());
+        val = new PApplet().random(0, 1) < 0.9 ? 2 : 4;
         insert_tile(pos, val);
     }
 
@@ -149,10 +151,5 @@ public class Grid {
             s += String.format("%5s |", data[i] > 0 ? data[i]+"" : "");
         }
         return s;
-    }
-
-    // missing helper methods (Processing syntax)
-    static float random(float low, float high) {
-        return new java.util.Random().nextFloat(low, high);
     }
 }
