@@ -67,9 +67,12 @@ public class Game implements Game2048 {
 
     /**
      * tries to move in all 4 directions and checks if anything changed.
-     * If no move is possible, the game is over
+     * If no move is possible, the game is over.
+     * If there are any free slots, the game is not over
      */
     public boolean isGameOver() {
+        if (grid.free_slots() > 0)
+            return false;
         Grid tempGrid = grid.copy();
         for (int i=1; i<=4; i++) {
             tempGrid.move();
