@@ -2,7 +2,7 @@ package a.vw4;
 
 public interface Game2048 {
     /**
-     * makes a move based on given instruction
+     * makes a move based on given instruction (0: left; 1: up; 2: right; 3: down)
      */
     int play(int direction);
 

@@ -64,7 +64,7 @@ public class Edit2048 extends PApplet {
     public void keyPressed() {
         // arrow key?
         if (key == CODED && game) {
-            game2048.play(keyCode);
+            game2048.play(keyCode - LEFT);
             show(game2048.getGrid());
         }
         // reset game?
