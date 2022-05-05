@@ -1,9 +1,7 @@
 package a.vw4;
 
-import processing.core.PApplet;
-import static processing.core.PApplet.*;
-
 import java.util.Arrays;
+import java.util.Random;
 
 
 public class Grid {
@@ -32,7 +30,7 @@ public class Grid {
         for (int i=0; i<A; i++) {
             temp_grid[i+L*(L-1)-(i%L)*(L+1)-(i/L)*(L-1)] = data[i];
         }
-        arrayCopy(temp_grid, data);
+        System.arraycopy(temp_grid, 0, data, 0, data.length);
     }
 
     /**
@@ -121,8 +119,8 @@ public class Grid {
      */
     void random_tile() {
         int pos, val;
-        pos = (int)new PApplet().random(0, free_slots());
-        val = new PApplet().random(0, 1) < 0.9 ? 2 : 4;
+        pos = new Random().nextInt(0, free_slots());
+        val = new Random().nextFloat(0, 1) < 0.9 ? 2 : 4;
         insert_tile(pos, val);
     }
 
