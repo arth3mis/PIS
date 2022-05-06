@@ -22,13 +22,13 @@ public class Game implements Game2048 {
     /**
      * translates arrow key input into grid manipulation
      */
-    public int play(int direction) {
-        if (isGameOver() || direction < 0 || direction > 3) return 0;
+    public int play(Move direction) {
+        if (isGameOver()) return 0;
         Grid tempGrid = grid.copy();
         // player move
-        grid.rotate(direction);
+        grid.rotate(direction.ordinal());
         int points = grid.move();
-        grid.rotate(direction == 0 ? 0 : 4 - direction);
+        grid.rotate(direction.ordinal() == 0 ? 0 : 4 - direction.ordinal());
         // add tile if move had an effect
         if (!grid.equals(tempGrid)) {
             grid.random_tile();

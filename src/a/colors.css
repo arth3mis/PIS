@@ -7,6 +7,8 @@
     color: antiquewhite;
     color: rgb(243, 205, 156);
     color: #669900;
+}
+#processing {
     /*keyword style*/
     color: #33997e;
     color: #33997e;
@@ -14,11 +16,16 @@
     color: #d94a7a;
     color: #cc7832;
     color: #33997e;
+    color: #9876aa;
     /*function style*/
     color: #006699;
     color: #006699;
     color: #669900;
     color: #006699;
+    /*literal*/
+    color: #7D4793;
+    color: #718a62;
+    color: #6a8759; /*intellij string*/
     /*literal*/
     color: #6a8759;
     color: #718a62; color: #9876aa;

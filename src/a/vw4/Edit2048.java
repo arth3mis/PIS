@@ -13,7 +13,7 @@ public class Edit2048 extends PApplet {
 
     @Override
     public void settings() {
-        size(600, 600);
+        size(800, 800);
     }
 
     @Override
@@ -34,7 +34,8 @@ public class Edit2048 extends PApplet {
     }
 
     /**
-     * graphical game display
+     * graphical game display.
+     * Slot size is based on total width/height and tile count
      */
     void show(final int[] grid) {
         int L = (int)sqrt(grid.length);
@@ -63,8 +64,9 @@ public class Edit2048 extends PApplet {
     @Override
     public void keyPressed() {
         // arrow key?
-        if (key == CODED && game) {
-            game2048.play(keyCode - LEFT);
+        if (key == CODED && game &&
+                (keyCode == LEFT || keyCode == UP || keyCode == RIGHT || keyCode == DOWN)) {
+            game2048.play(Move.values()[keyCode - LEFT]);
             show(game2048.getGrid());
         }
         // reset game?

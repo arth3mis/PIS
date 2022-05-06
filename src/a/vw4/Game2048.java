@@ -2,9 +2,9 @@ package a.vw4;
 
 public interface Game2048 {
     /**
-     * makes a move based on given instruction (0: left; 1: up; 2: right; 3: down)
+     * makes a move based on given instruction
      */
-    int play(int direction);
+    int play(Move direction);
 
     /**
      * returns current game state (immutable)
@@ -20,9 +20,4 @@ public interface Game2048 {
      * checks for game end
      */
     boolean isGameOver();
-
-    /**
-     * string representation of current game field
-     */
-    String toString();
 }
