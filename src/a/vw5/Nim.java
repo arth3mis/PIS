@@ -1,6 +1,7 @@
 package a.vw5;
 
 import java.util.*;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 // https://gist.github.com/denkspuren/0abca660e8c483e8b022dad6bdc54109v
@@ -10,7 +11,7 @@ public class Nim implements NimGame {
     public int[] rows;
     private final int bitsPerRow;
     private final int bitsPattern;
-    private Map<Integer, Integer> states;  // state, rating
+    private static Map<Integer, Double> states;  // state, rating
     public static Nim of(int... rows) {
         return new Nim(rows);
     }
@@ -18,7 +19,7 @@ public class Nim implements NimGame {
         assert rows.length >= 1;
         assert Arrays.stream(rows).allMatch(n -> n >= 0);
         this.rows = Arrays.copyOf(rows, rows.length);
-        bitsPerRow = (int) Math.ceil(Math.log(Arrays.stream(rows).max().orElse(1)) / Math.log(2));
+        bitsPerRow = (int) Math.ceil(Math.log(Arrays.stream(rows).max().orElse(1) + 1) / Math.log(2));
         bitsPattern = Integer.parseInt("1".repeat(bitsPerRow), 2);
         if (bitsPerRow * rows.length <= 32)
             states = new HashMap<>();
@@ -49,44 +50,50 @@ public class Nim implements NimGame {
     }
     public Move findBestMove() {
         if (states == null) return null;
-        int[] l = Arrays.stream(rows).sorted().toArray();
-        int currentState = IntStream.range(0, rows.length)
-                .map(i -> l[i] << bitsPerRow * i)
-                .reduce((a,b) -> a | b).orElse(0);
-        int rating = negamax(1, currentState);
+        int currentState = stateHash(rows);
+        int nextState = Arrays.stream(calcNextStates(currentState))
+                .reduce((a, b) -> minimax(1, 1, a) >= minimax(1, 1, b) ? a : b).orElse(-1);
+        // decode move
+        int[] diff = stateUnhash(currentState - nextState);
+        for (int i = 0; i < diff.length; i++) {
+            if (diff[i] > 0) {
+                return Move.of(i, diff[i]);
+            }
+        }
         return null;
     }
-    private int negamax(int player, int state) {
-        if (state == 0) return -player;
-        /*if (states.containsKey(state))
-            return states.get(state);*/
-        int[] nextStates = calcNextStates(state);
-        if (nextStates.length == 0)
-            ;
-        int worstNextRating = Arrays.stream(nextStates).parallel()
-                .map(n -> -negamax(-player, n))
-                .max().orElse(0);
-
-        return worstNextRating;
+    private double minimax(int player, int depth, int state) {
+        if (state == 0) return player / (double) depth;  // rating function
+        if (states.containsKey(state))
+            return states.get(state);
+        DoubleStream ds = Arrays.stream(calcNextStates(state))//.parallel()
+                .mapToDouble(s -> minimax(-player, depth+1, s));
+        double rating = player == 1 ? ds.max().orElse(0) : ds.min().orElse(0);
+        states.put(state, rating);
+        System.out.println(Arrays.toString(stateUnhash(state)) + " = " + rating);  // debug
+        return rating;
     }
     private int[] calcNextStates(int state) {
         List<Integer> l = new ArrayList<>();
-        for (int i = 0; i < rows.length; i++) {
-            int stickCount = (state >> bitsPerRow * i) & bitsPattern;
-            int[] temp = {i};
-            String trailBits = Integer.toBinaryString(bitsPattern).repeat(temp[0]);
-            l.addAll(IntStream.rangeClosed(1, stickCount)
-                    .map(n -> {
-                        int x = 0;
-                        x |= (state & (bitsPattern << bitsPerRow * (rows.length - temp[0] - 1)));  // previous rows
-                        x |= ((stickCount - n) << bitsPerRow * temp[0]);  // row i
-                        if (!trailBits.isEmpty())
-                            x |= (state & Integer.parseInt(trailBits, 2));  // following rows
-                        return x;
-                    })
-                    .boxed().toList());
+        int[] r = stateUnhash(state);
+        for (int i = 0; i < r.length; i++) {
+            //l.addAll(IntStream.rangeClosed(1, r[i]).map(n -> n).boxed().toList());
+            for (int j = 1; j <= r[i]; j++) {
+                r[i] -= j;
+                l.add(stateHash(r));
+                r[i] += j;
+            }
         }
-        return l.stream().mapToInt(Integer::intValue).toArray();
+        return l.stream().distinct().mapToInt(i -> i).toArray();
+    }
+    private int stateHash(int[] r) {
+        int[] l = Arrays.stream(r).sorted().toArray();
+        return IntStream.range(0, r.length)
+                .map(i -> l[i] << bitsPerRow * i)
+                .reduce((a,b) -> a | b).orElse(0);
+    }
+    private int[] stateUnhash(int state) {
+        return IntStream.range(0, rows.length).map(i -> (state >> bitsPerRow * i) & bitsPattern).toArray();
     }
     public boolean isGameOver() {
         return Arrays.stream(rows).allMatch(n -> n == 0);
