@@ -18,7 +18,13 @@ public class State {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if (obj == null || obj.getClass() != getClass()) return false;
         return hash == ((State) obj).hash;
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
     }
 }
