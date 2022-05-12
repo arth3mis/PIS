@@ -9,6 +9,7 @@ import processing.core.PVector;
 import processing.event.MouseEvent;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 class NimGUI extends PApplet {
 
@@ -82,9 +83,7 @@ class NimGUI extends PApplet {
     }
 
     void resetGame() {
-        int[] setup = new int[rowChoice];
-        Arrays.fill(setup, maxColumns);
-        //gameRows = Nim.randomSetup(setup);
+        gameRows = IntStream.range(0, rowChoice).map(i -> new Random().nextInt(1, maxColumns+1)).toArray();
         game = Nim.of(gameRows);
         turn = 0;
         winner = -1;
