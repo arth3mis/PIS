@@ -16,7 +16,6 @@ public class Boilerplate extends PApplet {
     public void settings() {
         //fullScreen();
         size(800, 450);
-        smooth(8);
     }
 
     // variables
