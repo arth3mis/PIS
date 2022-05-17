@@ -1,19 +1,14 @@
-package j.vw2;
+package j.vw4;
 
-import herzi.nim.Move;
-import herzi.nim.Nim;
-import herzi.nim.NimGame;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.stream.IntStream;
 
-public class NimJuicy extends PApplet {
+public class NimJuicyBig extends PApplet {
 
     static final float MAX_ANGLE_SPEED = 0.5f;
     static final float FOLLOW_OFFSET = 42;
@@ -39,7 +34,7 @@ public class NimJuicy extends PApplet {
     int rowCount;
 
     public static void main(String[] args) {
-        PApplet.runSketch(new String[]{""}, new NimJuicy());
+        PApplet.runSketch(new String[]{""}, new NimJuicyBig());
     }
 
     ArrayList<ArrayList<Stick>> rows;
@@ -50,7 +45,7 @@ public class NimJuicy extends PApplet {
     boolean playerMove;
 
     public void settings() {
-        size(900, 700);
+        size(900, 800);
         //pixelDensity(displayDensity());
         //fullScreen();
     }
@@ -67,8 +62,8 @@ public class NimJuicy extends PApplet {
 
     void startNewGame() {
         // Generate Random Nim-Game
-        rowCount = (int) random(2, 5);
-        int columnCount = (int) random(2, 8);
+        rowCount = (int) random(2, 7);
+        int columnCount = (int) random(2, 19);
         int[] rowArray = new int[rowCount];
         for(int i = 0; i < rowArray.length; i++) {
             rowArray[i] = (int) random(columnCount) + 1;
@@ -97,7 +92,7 @@ public class NimJuicy extends PApplet {
         allElements.remove(button);
         allElements.add(button);
 
-        nim = Nim.of(rowArray);
+        nim = new BigNimKi(rowArray);
     }
 
     public void mousePressed() {
@@ -376,7 +371,7 @@ public class NimJuicy extends PApplet {
         }
 
         public void draw() {
-            fill(col, active ? 255f : 160f);
+            fill(col, active ? 255f : 69f);
             super.draw();
 
         }
@@ -522,13 +517,14 @@ public class NimJuicy extends PApplet {
                         won = true;
 
                     } else {
-                        Move computerMove;
+                        j.vw4.Move computerMove;
                         // Make Computer move
-                        if (0.15f / DIFFICULTY > random(1)) {
+                        /*if (0.15f / DIFFICULTY > random(1)) {
                             computerMove = nim.randomMove();
                         } else {
                             computerMove = nim.bestMove();
-                        }
+                        }*/
+                        computerMove = nim.bestMove();
                         for (int i = 0; i < computerMove.number; i++) {
                             Stick stick = rows.get(computerMove.row).get((int) random(rows.get(computerMove.row).size()));
                             stick.removeFromRow();
