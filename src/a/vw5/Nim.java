@@ -15,7 +15,7 @@ public class Nim implements NimGame {
     public static Nim of(int... rows) {
         return new Nim(rows);
     }
-    private Nim(int... rows) {
+    protected Nim(int... rows) {
         assert rows.length >= 1;
         assert Arrays.stream(rows).allMatch(n -> n >= 0);
         this.rows = Arrays.copyOf(rows, rows.length);

@@ -16,6 +16,19 @@ class Scratch {
         simulate(100_000);
     }
 
+    static void simulateWins(int n) {
+        Boolean[] wins = new Boolean[n];
+        System.out.println("\n" + "_".repeat(46) + "progress" + "_".repeat(45));
+        for (int i = 0; i < n; i++) {
+            Nim g = Nim.of(IntStream.generate(() -> new Random().nextInt(1,31)).limit(30).toArray());
+            wins[i] = herzi.nim.NimGame.isWinning(g.rows);
+            if (i > 20 && i % (n/100) == 0)
+                System.out.print("o");
+            //Nim.states.clear();
+        }
+        System.out.printf("\n\nwins in %,d random games: %,d", n, Arrays.stream(wins).filter(b -> b).count());
+    }
+
     static void simulate(int n) {
         long[] times = new long[n];
         for (int i = 0; i < n; i++) {
@@ -31,6 +44,6 @@ class Scratch {
                 System.out.print("o");
             //Nim.states.clear();
         }
-        System.out.printf("\n\naverage over %d games: %.2fns", n, Arrays.stream(times).average().orElse(0));
+        System.out.printf("\n\naverage over %,d games: %.2fns", n, Arrays.stream(times).average().orElse(0));
     }
 }

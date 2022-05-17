@@ -36,7 +36,7 @@ public class Nim implements NimGame {
                 (!NimGame.isWinning(nim.rows) && (moves.size() % 2) == 0);
     }
     */
-    private Nim(int... rows) {
+    protected Nim(int... rows) {
         assert rows.length >= 1;
         assert Arrays.stream(rows).allMatch(n -> n >= 0);
         this.rows = Arrays.copyOf(rows, rows.length);
