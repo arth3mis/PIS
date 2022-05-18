@@ -32,7 +32,7 @@ class Scratch {
     static void simulate(int n) {
         long[] times = new long[n];
         for (int i = 0; i < n; i++) {
-            Nim g = Nim.of(IntStream.range(0, 6).map(x -> new Random().nextInt(1,10)).toArray());
+            a.vw6.Nim g = a.vw6.Nim.of(IntStream.range(0, 6).map(x -> new Random().nextInt(1,10)).toArray());
             long start = System.nanoTime();
             g.bestMove();
             times[i] = System.nanoTime() - start;

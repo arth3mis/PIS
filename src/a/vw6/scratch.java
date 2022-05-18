@@ -11,9 +11,9 @@ class Scratch {
         //System.out.println("\n"+g.bestMove());
 
         // reference implementation
-        Boolean[][] correctSimulations = new Boolean[100][];
+        Boolean[][] correctSimulations = new Boolean[1000][];
         for (int i = 0; i < correctSimulations.length; i++) {
-            correctSimulations[i] = simulate(IntStream.generate(() -> new Random().nextInt(1,5)).limit(3).toArray());
+            correctSimulations[i] = simulate(IntStream.generate(() -> new Random().nextInt(1,10)).limit(6).toArray());
             //System.out.print("o");
         }
         System.out.printf("\n\nplayed as predicted (out of %d games): %d\npredicted losses: %d",

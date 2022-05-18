@@ -12,6 +12,8 @@ public class Nim implements NimGame {
 
     private static final Map<Nim, Integer> states = new HashMap<>();
 
+    private static final Map<Nim, Boolean> stateWin = new HashMap<>();
+
     private boolean log = false;
 
     public static Nim of(int... rows) {
@@ -58,12 +60,8 @@ public class Nim implements NimGame {
     /**
      * My Algorithm
      */
-    private Move bestMove;
     public Move bestMove() {
-        bestMove = null;
-        getWinMove(true);
-        if (bestMove == null) bestMove = randomMove();
-        return bestMove;
+        return getWinMove().orElse(randomMove());
 //        return generateSortedMoves()
 //                .reduce((x,y) -> play(y).searchWinMove() >= play(x).searchWinMove() ? y : x)
 //                .orElse(randomMove());
@@ -72,28 +70,34 @@ public class Nim implements NimGame {
 //                .reduce(((x, y) -> play(x).miniMax(-1, 1) > play(y).miniMax(-1, 1) ? x : y))
 //                .orElse(null);
     }
-    public boolean hasBestMove() {
-        return searchWinMove() > 0;
+    private List<Move> generateMoves() {
+        return IntStream.range(0, rows.length).boxed()
+                .flatMap(i -> IntStream.rangeClosed(1, rows[i]).mapToObj(n -> Move.of(i, n))).toList();
     }
-    private int getWinMove(boolean setMove) {
+    private Optional<Move> getWinMove() {
+        return generateMoves().stream()
+                .filter(m -> !play(m).findWinMove())
+                .reduce((x,y) -> x.number > y.number ? x : y);
+    }
+    private boolean findWinMove() {
         if (isGameOver())
-            return -1;
-        List<Move> moves = generateMoves();
-        for (Move m : moves) {
-            if (play(m).getWinMove(false) < 0) {
-                if (setMove) bestMove = m;
-                return 1;
-            }
+            return false;
+        Boolean cached = stateWin.get(this);
+        if (cached != null) {
+            return cached;
         }
-        return -1;
+        boolean rating = getWinMove().isPresent();
+        stateWin.put(this, rating);
+        return rating;
     }
     private int searchWinMove() {
         if (isGameOver())
             return -1;
         Integer cached = states.get(this);
-        if (cached != null)
+        if (cached != null) {
             return cached;
-        Move winMove = generateSortedMoves()
+        }
+        Move winMove = generateMoves().stream().sorted(Comparator.comparingInt(m -> -m.number))
                 .filter(m -> play(m).searchWinMove() < 0)  // following state must be a losing state
                 .findFirst().orElse(null);
         int rating = winMove == null ? -1 : play(winMove).searchWinMove();
@@ -117,13 +121,6 @@ public class Nim implements NimGame {
         if (log) System.out.printf("\n%sdepth=%d - hash=%d - best_rating=%d", "    ".repeat(depth), depth, hashCode(), bestRating);  // monitoring
         states.put(this, bestRating);
         return bestRating;
-    }
-    private Stream<Move> generateSortedMoves() {
-        return generateMoves().stream().sorted(Comparator.comparingInt(m -> m.number));
-    }
-    private List<Move> generateMoves() {
-        return IntStream.range(0, rows.length).boxed()
-                .flatMap(i -> IntStream.rangeClosed(1, rows[i]).mapToObj(n -> Move.of(i, n))).toList();
     }
     @Override
     public boolean equals(Object obj) {
