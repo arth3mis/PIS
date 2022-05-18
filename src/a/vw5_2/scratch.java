@@ -1,5 +1,7 @@
 package a.vw5_2;
 
+import a.vw6.NimUnclean;
+
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -32,7 +34,7 @@ class Scratch {
     static void simulate(int n) {
         long[] times = new long[n];
         for (int i = 0; i < n; i++) {
-            a.vw6.Nim g = a.vw6.Nim.of(IntStream.range(0, 6).map(x -> new Random().nextInt(1,10)).toArray());
+            NimUnclean g = NimUnclean.of(IntStream.range(0, 6).map(x -> new Random().nextInt(1,10)).toArray());
             long start = System.nanoTime();
             g.bestMove();
             times[i] = System.nanoTime() - start;

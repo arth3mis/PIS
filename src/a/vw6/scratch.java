@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 class Scratch {
     public static void main(String[] args) {
         // example instance for testing & monitoring
-        NimGame g = Nim.of(1,2);
+        NimGame g = NimUnclean.of(1,2);
         //System.out.println("\n"+g.bestMove());
 
         // reference implementation
@@ -22,7 +22,7 @@ class Scratch {
     }
 
     static Boolean[] simulate(int[] rows) {
-        NimGame g = Nim.of(rows);
+        NimGame g = NimUnclean.of(rows);
         boolean winsAgainstPerfect = g.isWinning();
         //System.out.printf("%s - will win: %5b", g.toString().replace('\n', '.'), winsAgainstPerfect);
         // minimax starts and should achieve the predicted result
