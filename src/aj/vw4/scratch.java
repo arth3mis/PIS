@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class Scratch {
+class Scratchy {
     public static void main(String[] args) {
         List<String> immutable = List.of("aaa", "c", "bb");
         List<String> mutable = new ArrayList<>(immutable);
