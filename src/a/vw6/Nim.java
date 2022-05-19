@@ -12,21 +12,13 @@ public class Nim implements NimGame {
 
     private static final Map<Nim, Boolean> states = new HashMap<>();
 
-    private boolean log = false;
+    public static boolean log = false;
+    private static String depth = "";
 
     public static Nim of(int... rows) {
         return new Nim(rows);
     }
 
-    public static ArrayList<Move> autoplay(NimGame nim) {
-        ArrayList<Move> moves = new ArrayList<>();
-        while (!nim.isGameOver()) {
-            Move m = nim.bestMove();
-            moves.add(m);
-            nim = nim.play(m);
-        }
-        return moves;
-    }
     protected Nim(int... rows) {
         assert rows.length >= 1;
         assert Arrays.stream(rows).allMatch(n -> n >= 0);
@@ -59,6 +51,10 @@ public class Nim implements NimGame {
      * My Algorithm
      */
     public Move bestMove() {
+        if (log) {
+            System.out.printf("\n%shash=%d (%s)", depth, hashCode(), toString().replace('\n', '.'));  // monitoring
+            depth += "    ";
+        }
         return getWinMove().orElse(randomMove());
     }
     private Optional<Move> getWinMove() {
@@ -67,13 +63,28 @@ public class Nim implements NimGame {
                 .reduce((x,y) -> x.number > y.number ? x : y);
     }
     private boolean findWinMove() {
-        if (isGameOver())
+        if (isGameOver()) {
+            if (log) {
+                System.out.printf("\n%s[[GAME OVER]]", depth);
+            }
             return false;
+        }
         Boolean cached = states.get(this);
+        if (log) {
+            System.out.printf("\n%shash=%d (%s) - cache=%s", depth, hashCode(), toString().replace('\n', '.'), cached==null?"n":cached?"T":"F");  // monitoring
+            depth += "    ";
+        }
         if (cached != null) {
+            if (log) {
+                depth = depth.substring(4);
+            }
             return cached;
         }
-        boolean rating = getWinMove().isPresent();
+        boolean rating = getWinMove().isPresent();  // indirect recursive call
+        if (log) {
+            depth = depth.substring(4);
+            System.out.printf("\n%shash=%d --> rating=%s", depth, hashCode(), rating?"T":"F");  // monitoring
+        }
         states.put(this, rating);
         return rating;
     }
