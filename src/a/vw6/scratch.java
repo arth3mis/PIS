@@ -6,22 +6,22 @@ import java.util.stream.IntStream;
 
 class TestNim {
     public static void main(String[] args) {
-//        NimUnclean.log = true;
-//        NimGame gg = NimUnclean.of(1,2);
-//        Move mm = gg.bestMove();
-//        System.out.printf("\n\n--> Best move: %s to state with hash=%d\n", mm, gg.play(mm).hashCode());
-//        NimUnclean.log = false;
-//        if (true) return;
-
         // example instance for testing & monitoring
-        Nim.log = false;
+        Nim.log = true;
         NimGame g = Nim.of(1,2);
         Move m = g.bestMove();
         System.out.printf("\n\n--> Best move: %s to state with hash=%d\n", m, g.play(m).hashCode());
+        assert m.equals(Move.of(1,1));
         Nim.log = false;
+
+        // more test cases
+        assert Nim.of(3,3,3).bestMove().equals(Move.of(2,3));
+        assert Nim.of(8,6,4).bestMove().equals(Move.of(0,6));
+        assert Nim.of(5,6,1,8).bestMove().equals(Move.of(3,6));
 
         // reference implementation
         Boolean[][] correctSimulations = new Boolean[100_000][];
+        System.out.println("\nProgress:");
         for (int i = 0; i < correctSimulations.length; i++) {
             correctSimulations[i] = simulate(IntStream.generate(() -> new Random().nextInt(1,10)).limit(6).toArray());
             if (i%(correctSimulations.length/100) == 0) System.out.print("o");
@@ -32,7 +32,7 @@ class TestNim {
     }
 
     static Boolean[] simulate(int[] rows) {
-        NimGame g = NimUnclean.of(rows);
+        NimGame g = Nim.of(rows);
         boolean winsAgainstPerfect = g.isWinning();
         //System.out.printf("%s - will win: %5b", g.toString().replace('\n', '.'), winsAgainstPerfect);
         // minimax starts and should achieve the predicted result

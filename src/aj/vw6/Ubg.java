@@ -22,8 +22,9 @@ public class Ubg {
         for (int i = 0; i < 100; i++) {
 //            System.out.println(i + ": " + isPrime.test(i));
         }
-        BigInteger bi = BigInteger.probablePrime(100, new Random(42));
-        System.out.println(bi);
-        System.out.println(bi.isProbablePrime(1));
+//        BigInteger bi = BigInteger.probablePrime(100, new Random(42));
+//        System.out.println(bi);
+//        System.out.println(bi.nextProbablePrime());
+//        System.out.println(bi.nextProbablePrime().isProbablePrime(1));
     }
 }
