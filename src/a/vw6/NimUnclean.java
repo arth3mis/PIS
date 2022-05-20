@@ -13,7 +13,7 @@ public class NimUnclean implements NimGame {
 
     private static final Map<NimUnclean, Boolean> stateWin = new HashMap<>();
 
-    private boolean log = false;
+    public static boolean log = false;
 
     public static NimUnclean of(int... rows) {
         return new NimUnclean(rows);
@@ -60,14 +60,13 @@ public class NimUnclean implements NimGame {
      * My Algorithm
      */
     public Move bestMove() {
-        return getWinMove().orElse(randomMove());
+//        return getWinMove().orElse(randomMove());
 //        return generateSortedMoves()
 //                .reduce((x,y) -> play(y).searchWinMove() >= play(x).searchWinMove() ? y : x)
 //                .orElse(randomMove());
-//        List<Move> l = generateMoves();
-//        return l.stream()
-//                .reduce(((x, y) -> play(x).miniMax(-1, 1) > play(y).miniMax(-1, 1) ? x : y))
-//                .orElse(null);
+        return generateMoves().stream()
+                .reduce(((x, y) -> play(x).negaMax(-1, 1) <= play(y).negaMax(-1, 1) ? x : y))
+                .orElse(randomMove());
     }
     private List<Move> generateMoves() {
         return IntStream.range(0, rows.length).boxed()
@@ -96,27 +95,28 @@ public class NimUnclean implements NimGame {
         if (cached != null) {
             return cached;
         }
-        Move winMove = generateMoves().stream().sorted(Comparator.comparingInt(m -> -m.number))
+        Move winMove = generateMoves().stream()
                 .filter(m -> play(m).searchWinMove() < 0)  // following state must be a losing state
                 .findFirst().orElse(null);
         int rating = winMove == null ? -1 : play(winMove).searchWinMove();
         states.put(this, -1);
         return -1;
     }
-    private int miniMax(int player, int depth) {
+    private int negaMax(int player, int depth) {
         Integer cached = states.get(this);
         if (log) System.out.printf("\n%sdepth=%d - hash=%d (%s) - cached=%d - player=%d", "    ".repeat(depth), depth, hashCode(), toString().replace('\n', '.'), cached != null ? cached : 0, player == 1 ? 1 : 2);  // monitoring
         if (cached != null)
             return cached;
         if (isGameOver()) {
             if (log) System.out.print("\t\t\t\t\t\t\t////////////////////////  GAME OVER  ////////////////////////");  // monitoring
-            return -player;  // rating function
+            return -1;  // rating function
         }
         List<Move> moves = generateMoves();
         assert !moves.isEmpty();  // testing
         if (log) System.out.printf(" - possible_moves=%d", moves.size());  // monitoring
-        IntStream ratings = moves.stream().mapToInt(m -> play(m).miniMax(-player, depth+1));
-        int bestRating = player == 1 ? ratings.max().orElse(0) : ratings.min().orElse(0);
+        IntStream ratings = moves.stream().mapToInt(m -> -play(m).negaMax(-player, depth+1));
+//        int bestRating = player == 1 ? ratings.max().orElse(0) : ratings.min().orElse(0);
+        int bestRating = ratings.max().getAsInt();
         if (log) System.out.printf("\n%sdepth=%d - hash=%d - best_rating=%d", "    ".repeat(depth), depth, hashCode(), bestRating);  // monitoring
         states.put(this, bestRating);
         return bestRating;

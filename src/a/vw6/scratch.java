@@ -4,13 +4,20 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-class Scratch {
+class TestNim {
     public static void main(String[] args) {
+//        NimUnclean.log = true;
+//        NimGame gg = NimUnclean.of(1,2);
+//        Move mm = gg.bestMove();
+//        System.out.printf("\n\n--> Best move: %s to state with hash=%d\n", mm, gg.play(mm).hashCode());
+//        NimUnclean.log = false;
+//        if (true) return;
+
         // example instance for testing & monitoring
-        Nim.log = true;
+        Nim.log = false;
         NimGame g = Nim.of(1,2);
         Move m = g.bestMove();
-        System.out.println("\n\n--> Best move: "+m+" to state with hash="+g.play(m).hashCode()+"\n");
+        System.out.printf("\n\n--> Best move: %s to state with hash=%d\n", m, g.play(m).hashCode());
         Nim.log = false;
 
         // reference implementation
@@ -25,7 +32,7 @@ class Scratch {
     }
 
     static Boolean[] simulate(int[] rows) {
-        NimGame g = Nim.of(rows);
+        NimGame g = NimUnclean.of(rows);
         boolean winsAgainstPerfect = g.isWinning();
         //System.out.printf("%s - will win: %5b", g.toString().replace('\n', '.'), winsAgainstPerfect);
         // minimax starts and should achieve the predicted result

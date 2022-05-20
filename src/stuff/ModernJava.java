@@ -3,7 +3,7 @@ package stuff;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.IntBinaryOperator;
+import java.util.function.*;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -14,6 +14,27 @@ public class ModernJava {
     public static void main(String[] args) {
         //streams();
         //int n = Operator.ADD.op.applyAsInt(1, 2);
+    }
+
+    static void lambdas() {
+        Predicate<Object> l1 = x -> x.hashCode() == 42;
+
+        Function<Object, String> l2 = x -> x.toString()+"";
+        Function<Object, String> l2_1 = Objects::toString;
+
+        Consumer<Object> l3 = x -> System.out.println(x+"");
+        Consumer<Object> l3_1 = System.out::println;
+
+        Supplier<String> l4 = () -> "42";
+        Supplier<Object> l4_1 = Object::new;
+
+        UnaryOperator<Object> l5 = x -> x;
+
+        BinaryOperator<Object> l6 = (x,y) -> y;
+
+        Comparable<Object> l7 = x -> x.hashCode()+1;
+
+        // most stuff has Int_, Long_, Double_ analogs
     }
 
     enum Operator {
