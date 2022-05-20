@@ -6,11 +6,16 @@ import java.util.stream.IntStream;
 
 class TestNim {
     public static void main(String[] args) {
+
+        /*
+        MISSING: test on micro level (method testing)
+         */
+
         // example instance for testing & monitoring
         Nim.log = true;
         NimGame g = Nim.of(1,2);
         Move m = g.bestMove();
-        System.out.printf("\n\n--> Best move: %s to state with hash=%d\n", m, g.play(m).hashCode());
+        if (Nim.log) System.out.printf("\n\n--> Best move: %s to state with hash=%d\n", m, g.play(m).hashCode());
         assert m.equals(Move.of(1,1));
         Nim.log = false;
 
@@ -23,7 +28,7 @@ class TestNim {
         Boolean[][] correctSimulations = new Boolean[100_000][];
         System.out.println("\nProgress:");
         for (int i = 0; i < correctSimulations.length; i++) {
-            correctSimulations[i] = simulate(IntStream.generate(() -> new Random().nextInt(1,10)).limit(6).toArray());
+            correctSimulations[i] = simulate(IntStream.generate(() -> new Random().nextInt(1,4)).limit(4).toArray());
             if (i%(correctSimulations.length/100) == 0) System.out.print("o");
         }
         System.out.printf("\n\nplayed as predicted (out of %,d games): %,d\npredicted losses: %,d",
